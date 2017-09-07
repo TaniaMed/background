@@ -99,6 +99,7 @@ function crossRotare(crosses) {
     });
 
 };
+
 function changeCoord(x, y, size, angle, oldAngle) {
     return {
         x: x + radius * Math.cos(angle + oldAngle),
@@ -106,16 +107,23 @@ function changeCoord(x, y, size, angle, oldAngle) {
     }
 };
 
+function changeBackCoord(x, y, size, angle, oldAngle) {
+    return {
+        x: x - radius * Math.cos(angle + oldAngle),
+        y: y - radius * Math.sin(angle + oldAngle)
+    }
+};
+
 
 let radius = 0;
 function drawСrosses(x, y, size, angle, oldAngle) {
     ctx.globalAlpha = 1;
-    radius = size / 2;
+    radius = size / 4;
     console.log(Math.cos(angle + oldAngle));
-    let coord1 = changeCoord(x, y, size, angle, oldAngle);
+    let coord1 = changeBackCoord(x, y, size, angle, oldAngle);
     let coord2 = changeCoord(x + size, y, size, angle, oldAngle);
     let coord3 = changeCoord((x + (size / 2)), (y - (size / 2)), size, angle, oldAngle);
-    let coord4 = changeCoord(x + (size / 2), (y + (size / 2)), size, angle, oldAngle);
+    let coord4 = changeBackCoord(x + (size / 2), (y + (size / 2)), size, angle, oldAngle);
     
     ctx.beginPath();
     ctx.moveTo(coord1.x, coord1.y);
