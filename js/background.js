@@ -30,7 +30,8 @@ function choiceCoordinatesFigures() {
                         y: y + Math.sin((45 + x + (time / 10)) / 100) * 4
                     }
                 },
-                size: rendNum(0.1, 0.6)
+                size: rendNum(0.1, 0.6),
+                angle: rendNum(-0.2, 0.2)
             }
             break;
         case 1:
@@ -43,7 +44,8 @@ function choiceCoordinatesFigures() {
                         y: y + Math.sin((10 + x + (time / 10)) / 100) * 2
                     }
                 },
-                size: rendNum(0.1, 0.6)
+                size: rendNum(0.1, 0.6),
+                angle: rendNum(-0.2, 0.2)
             }
     }
 }
@@ -85,8 +87,7 @@ function createСrosses() {
     for (let crosses = 0; crosses <= numberFigures; crosses++) {
         let figure = choiceCoordinatesFigures();
         figure.size *= 20;
-        figure.angle = rendNum(0, 2 * Math.PI);
-        figure.speed = integerRandomNumber(-0.2, 0.2);
+        figure.oldAngle = 0;
         crossesAll.push(figure);
     }
     return;
@@ -98,18 +99,36 @@ function crossRotare(crosses) {
     });
 
 };
+function changeCoord(x, y, size, angle, oldAngle) {
+    return {
+        x: x + radius * Math.cos(angle + oldAngle),
+        y: y + radius * Math.sin(angle + oldAngle)
+    }
+};
 
-function drawСrosses(x, y, size) {
+
+let radius = 0;
+function drawСrosses(x, y, size, angle, oldAngle) {
     ctx.globalAlpha = 1;
+    radius = size / 2;
+    console.log(Math.cos(angle + oldAngle));
+    let coord1 = changeCoord(x, y, size, angle, oldAngle);
+    let coord2 = changeCoord(x + size, y, size, angle, oldAngle);
+    let coord3 = changeCoord((x + (size / 2)), (y - (size / 2)), size, angle, oldAngle);
+    let coord4 = changeCoord(x + (size / 2), (y + (size / 2)), size, angle, oldAngle);
+    
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + size, y);
-    ctx.moveTo(x + (size / 2), y - (size / 2));
-    ctx.lineTo(x + (size / 2), y + (size / 2));
+    ctx.moveTo(coord1.x, coord1.y);
+    ctx.quadraticCurveTo(coord1.x, coord1.y, coord2.x, coord2.y);
+    ctx.moveTo(coord3.x, coord3.y);
+    ctx.quadraticCurveTo(coord3.x, coord3.y, coord4.x, coord4.y);
     ctx.closePath();
+    
     ctx.strokeStyle = 'rgba(255,255,255,1)';
-    ctx.lineWidth = size / 4;
-    ctx.stroke();
+    ctx.lineWidth = size / 4;    
+    ctx.stroke(); 
+    oldAngle += angle;
+    return oldAngle; 
 }
 
 createСircles();
@@ -119,8 +138,7 @@ render();
 function changePosition(figures, funct) {
     figures.forEach((figure) => {
         let figureCoord = figure.fun(figure.x, figure.y, Date.now())
-
-        funct(figureCoord.x, figureCoord.y, figure.size);
+        figure.oldAngle = funct(figureCoord.x, figureCoord.y, figure.size, figure.angle, figure.oldAngle);
 
     });
 }
@@ -130,6 +148,5 @@ function render() {
     ctx.fillRect(0, 0, 800, 400);
     changePosition(circlesAll, drawCircles);
     changePosition(crossesAll, drawСrosses);
-    requestAnimationFrame(render);
-
+    requestAnimationFrame(render);    
 }
